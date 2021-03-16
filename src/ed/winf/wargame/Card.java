@@ -1,7 +1,7 @@
 package ed.winf.wargame;
 
 public class Card {
-	public String suit;
+	public String suit = null;
     public String rank = null;
     
     public int getRank() {

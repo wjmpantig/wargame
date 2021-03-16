@@ -74,8 +74,7 @@ public class Main {
 		for(int i=0; i < playerCount; i++) {
 			playerCards.add(new ArrayList<Card>());
 		}
-//		int player = 0;
-		for(int i=0; i < shuffledDeck.size(); i++) {
+		for(int i = shuffledDeck.size() - 1; i >= 0; i--) {
 			Card card = shuffledDeck.get(i);
 			int player = i % playerCount;
 			
@@ -84,9 +83,6 @@ public class Main {
 			playerDeck.add(card);
 			playerCards.set(player, playerDeck);
 			player++;
-//			if (player == playerCount) {
-//				player = 0;
-//			}
 		}
 		//battle time here
 		int round = 0;
@@ -103,7 +99,7 @@ public class Main {
 					continue;
 				}
 				playerWithCards++;
-				Card playerCard = playerDeck.get(0);
+				Card playerCard = playerDeck.get(playerDeck.size() - 1);
 				tableCards[i] = playerCard;
 				System.out.println("player " + i + ": " + playerCard);
 				if (highestCard == null) {
@@ -122,15 +118,15 @@ public class Main {
 			for(int i=0; i < playerCount; i++) {
 				ArrayList<Card> playerDeck = playerCards.get(i);
 				if (!playerDeck.isEmpty()) {
-					playerDeck.remove(0);					
+					playerDeck.remove(playerDeck.size() - 1);					
 				}
 			}
+			playerCards.get(highestPlayerNumber).add(0,highestCard); //add highest card first
 			for(int i=0; i < playerCount; i++) {
 				Card card = tableCards[i];
-				if (card != null ) {
-					playerCards.get(highestPlayerNumber).add(card);
+				if (card != null || !highestCard.equals(card)) {
+					playerCards.get(highestPlayerNumber).add(0, card);
 				}
-				
 			}
 			round++;
 			for (int i=0; i< playerCount; i++) {
