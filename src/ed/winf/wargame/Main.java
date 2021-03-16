@@ -14,7 +14,7 @@ public class Main {
 // 		File file = new File("C:/Users/turin/Downloads/Card Sequence.txt");
 // 		Scanner scan = new Scanner(file);
         // hardcoded deck;
-		String cardsStr = "D-A,D-K,D-Q,D-J,D-10,D-9,D-8,D-7,D-6,D-5,D-4,D-3,D-2,H-A,H-K,H-Q,H-J,H-10,H-9,H-8,H-7,H-6,H-5,H-4,H-3,H-2,S-A,S-K,S-Q,S-J,S-10,S-9,S-8,S-7,S-6,S-5,S-4,S-3,S-2,C-A,C-K,C-Q,C-J,C-10,C-9,C-8,C-7,C-6,C-5,C-4,C-3,C-2";
+		String cardsStr = "D-A,D-K,D-Q,D-J,D-10,D-9,D-8,D-7,D-6,D-5,D-4,D-3,D-2,H-A,H-K,H-Q,H-J,H-10,H-9,H-8,H-7,H-6,H-5,H-4,H-3,H-2,S-A,S-K,S-Q,S-J,S-10,S-9,S-8,S-7,S-6,S-5,S-4,S-3,S-2,C-A,C-K,C-Q,C-J,C-10,C-9,C-8,C-7,C-6,C-5,C-4,C-3,C-2, ,D-123,A2,C1";
 // 		scan.close();
 		
 		//Seperator don sa Text file
@@ -23,11 +23,19 @@ public class Main {
 		while(stk.hasMoreTokens()) { //iterate tokenized strings
 			String token = stk.nextToken(); //D-A
 //			System.out.println(token);
+			if (token.length() < 3 || token.length() > 4) {
+				System.out.println("skipping invalid input: " + token);
+				continue;
+			}
 			Card card = new Card();
 			String[] s = token.split("-"); // ["D" , "A"]
 		
 			card.suit = s[0];
 			card.rank = s[1];
+			if (card.getRank() == -1 || card.getSuitRank() == -1) {
+				System.out.println("skipping invalid input: " + token);
+				continue;
+			}
 			deck.add(card);
 		}
 		//output cards
@@ -40,7 +48,8 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		int playerCount = 0;
 		int shuffleLimit = 0;
-		System.out.print("Input number of players: ");
+		
+		System.out.print("Input number of players: "); //TODO: catch invalid input
 		playerCount = Integer.parseInt(scanner.nextLine());
 		System.out.print("Input number of shuffle: ");
 		shuffleLimit = Integer.parseInt(scanner.nextLine());
@@ -87,9 +96,9 @@ public class Main {
 		//battle time here
 		int round = 0;
 		int playerWithCards = 0;
+		int highestPlayerNumber = -1; 
 		do {
 			playerWithCards = 0;
-			int highestPlayerNumber = -1; 
 			Card highestCard = null;
 			System.out.println("round " + round);
 			Card[] tableCards = new Card[playerCount];
@@ -128,7 +137,9 @@ public class Main {
 			playerCards.get(highestPlayerNumber).add(0,highestCard); //add highest card first
 			for(int i=0; i < playerCount; i++) {
 				Card card = tableCards[i];
-				if (card != null || !highestCard.equals(card)) {
+				
+				if (card != null && !highestCard.equals(card)) {
+					System.out.println("give " + card + "to player" + highestPlayerNumber);
 					playerCards.get(highestPlayerNumber).add(0, card);
 				}
 			}
@@ -142,6 +153,7 @@ public class Main {
 				System.out.println();
 			}
 		} while (playerWithCards > 1);
+		System.out.println("winner is player " + highestPlayerNumber);
 		
 	}	
 }
