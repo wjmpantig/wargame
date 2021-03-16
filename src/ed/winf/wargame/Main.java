@@ -19,7 +19,7 @@ public class Main {
 		
 		//Seperator don sa Text file
 		StringTokenizer stk = new StringTokenizer(cardsStr, ","); //split the string with token comma
-		ArrayList<Card> deck = new ArrayList<Card>();
+		Deck deck = new Deck();
 		while(stk.hasMoreTokens()) { //iterate tokenized strings
 			String token = stk.nextToken(); //D-A
 //			System.out.println(token);
@@ -36,14 +36,9 @@ public class Main {
 				System.out.println("skipping invalid input: " + token);
 				continue;
 			}
-			deck.add(card);
+			deck.insert(card);
 		}
-		//output cards
-//		System.out.println("deck size " + deck.size());
-//		for(int i=0; i < deck.size(); i++) {
-//			Card card = deck.get(i);
-//			System.out.println(card.suit + " " + card.rank);
-//		}
+		deck.printCards();
 		
 		Scanner scanner = new Scanner(System.in);
 		int playerCount = 0;
@@ -54,43 +49,23 @@ public class Main {
 		System.out.print("Input number of shuffle: ");
 		shuffleLimit = Integer.parseInt(scanner.nextLine());
 		
-		int shuffleCount = 0;
-		ArrayList<Card> shuffledDeck = null;
-		ArrayList<Card> refDeck = deck;
-		while(shuffleCount < shuffleLimit){
-			shuffledDeck = new ArrayList<Card>();
-			int half = deck.size() / 2;
-			ArrayList<Card> deck1 = new ArrayList<Card>(refDeck.subList(0, half));
-			ArrayList<Card> deck2 = new ArrayList<Card>(refDeck.subList(half, deck.size()));
-			int i = 0;
-			while(i < half) {
-				shuffledDeck.add(deck1.get(i));
-				shuffledDeck.add(deck2.get(i));
-				i++;
-			}
-			refDeck = shuffledDeck;
-			shuffleCount++;
-		};
+		deck.shuffle(shuffleLimit);
 		
 		//output cards
-		System.out.println("deck size " + shuffledDeck.size());
-		for(int i=0; i < shuffledDeck.size(); i++) {
-			Card card = shuffledDeck.get(i);
-			System.out.println((i+1)+":" + card.suit + " " + card.rank);
-		}
-		ArrayList<ArrayList<Card>> playerCards = new ArrayList<ArrayList<Card>>();
+		deck.printCards();
+		
+		ArrayList<Player> players = new ArrayList<Player>();
 		//initialize deck
 		for(int i=0; i < playerCount; i++) {
-			playerCards.add(new ArrayList<Card>());
+			players.add(new Player());
 		}
-		for(int i = shuffledDeck.size() - 1; i >= 0; i--) {
-			Card card = shuffledDeck.get(i);
+		for(int i = deck.size() - 1; i >= 0; i--) {
+			Card card = deck.draw();
 			int player = i % playerCount;
 			
 			System.out.println("giving" + (i+1)+":" + card.suit + " " + card.rank + " to player " + player);
-			ArrayList<Card> playerDeck = playerCards.get(player);
-			playerDeck.add(card);
-			playerCards.set(player, playerDeck);
+			Deck playerDeck = players.get(player).getDeck();
+			playerDeck.insert(card);
 			player++;
 		}
 		//battle time here
@@ -103,12 +78,12 @@ public class Main {
 			System.out.println("round " + round);
 			Card[] tableCards = new Card[playerCount];
 			for(int i=0; i < playerCount; i++) {
-				ArrayList<Card> playerDeck = playerCards.get(i);
+				Deck playerDeck = players.get(i).getDeck();
 				if (playerDeck.isEmpty()) {
 					continue;
 				}
 				playerWithCards++;
-				Card playerCard = playerDeck.get(playerDeck.size() - 1);
+				Card playerCard = playerDeck.draw();
 				tableCards[i] = playerCard;
 				System.out.println("player " + i + ": " + playerCard);
 				if (highestCard == null) {
@@ -127,30 +102,21 @@ public class Main {
 				
 			}
 			
-			System.out.println("player " + highestPlayerNumber + "wins with card" + highestCard.suit + highestCard.rank);
-			for(int i=0; i < playerCount; i++) {
-				ArrayList<Card> playerDeck = playerCards.get(i);
-				if (!playerDeck.isEmpty()) {
-					playerDeck.remove(playerDeck.size() - 1);					
-				}
-			}
-			playerCards.get(highestPlayerNumber).add(0,highestCard); //add highest card first
+			System.out.println("player " + highestPlayerNumber + " wins with card " + highestCard);
+			players.get(highestPlayerNumber).getDeck().insertToBottom(highestCard); //add highest card first
 			for(int i=0; i < playerCount; i++) {
 				Card card = tableCards[i];
 				
 				if (card != null && !highestCard.equals(card)) {
 					System.out.println("give " + card + "to player" + highestPlayerNumber);
-					playerCards.get(highestPlayerNumber).add(0, card);
+					players.get(highestPlayerNumber).getDeck().insertToBottom(card);
 				}
 			}
 			round++;
 			for (int i=0; i< playerCount; i++) {
-				ArrayList<Card> playerDeck = playerCards.get(i);
+				Deck playerDeck = players.get(i).getDeck();
 				System.out.println("player " + i + "deck:");
-				for (Card card : playerDeck) {
-					System.out.print(card + ",");
-				}
-				System.out.println();
+				playerDeck.printCardsComma();
 			}
 		} while (playerWithCards > 1);
 		System.out.println("winner is player " + highestPlayerNumber);
