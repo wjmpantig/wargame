@@ -14,6 +14,16 @@ public class Card {
         return -1;
     }
     
+    public int getSuitRank() {
+    	String[] suitOrder = {"C", "S", "H", "D"};
+        for(int i=0; i<suitOrder.length; i++) {
+        	if (suitOrder[i].equals(this.suit)) {
+        		return i;
+        	}
+        }
+        return -1;
+    }
+    
     public String toString() {
     	return suit + rank;
     }
